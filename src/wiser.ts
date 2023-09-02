@@ -149,7 +149,7 @@ export class Wiser extends EventEmitter {
                     case '1':
                         deviceType = DeviceType.dimmer;
                         break;
-                    case '10':
+                    case '16':
                         deviceType = DeviceType.blind;
                         break;
                     case '25':

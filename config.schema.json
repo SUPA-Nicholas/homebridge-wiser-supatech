@@ -1,5 +1,5 @@
 {
-	"pluginAlias": "homebridge-wiser",
+	"pluginAlias": "homebridge-wiser-supatech",
 	"pluginType": "platform",
 	"singular": false,
 	"schema": {
