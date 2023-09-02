@@ -1,7 +1,7 @@
 homebridge-wiser-supatech
 ================
 
-homebridge-wiser is a plug-in for [Homebridge](https://github.com/homebridge/homebridge)
+homebridge-wiser-supatecch is a plug-in for [Homebridge](https://github.com/homebridge/homebridge)
 that adds support for the original Clipsal C-Bus Wiser and the Clipsal Wiser 2.
 
 Accessories are automatically discovered from the Wiser project.  To add
@@ -29,7 +29,7 @@ Other enhancements in 2.0 include:
 Configuration
 -------------
 
-*homebridge-wiser* is added as a `platform` in your config.json:
+*homebridge-wiser-supatech* is added as a `platform` in your config.json:
 
 ```JSON
 "platforms": [
