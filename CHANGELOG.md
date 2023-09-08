@@ -1,6 +1,10 @@
 # Change log
 
-## 2.1.5
+## 2.2.0
+
+- Change net.socket to websocket for wiser 2 firmware starting from 1.33.1
+
+## 2.1.4
 
 - Fix shuttle relay issue (shuttle relay was recognised as switch not blind)
 

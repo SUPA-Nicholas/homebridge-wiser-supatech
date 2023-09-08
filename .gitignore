@@ -1,6 +1,9 @@
 # Ignore compiled code
 dist
 
+# Ignore lock package
+package-lock.json
+
 # Mac
 .DS_Store
 

@@ -1,18 +1,23 @@
 'use strict';
 
 import { EventEmitter } from 'events';
-import net from 'net';
+//import net from 'net';
 import { AccessoryAddress, DeviceType, GroupSetEvent, WiserProjectGroup } from './models';
 import { Logger } from 'homebridge';
-import { Socket } from 'net';
+//import { Socket } from 'net';
+import WebSocket from 'ws';
+import {SHA256} from 'crypto-js';
+//import { resolve } from 'path';
 
 export class Wiser extends EventEmitter {
 
-    private wiserURL: string;
+    private wsURL: string;
+    private httpURL: string;
     private backoff = 1000;
     private got = require('got');
     private xml2js = require('xml2js');
-    private socket: Socket | null = null;
+    //private socket: Socket | null = null;
+    private wsSocket: WebSocket | null = null;
     private authKey = '';
     private initialRetryDelay = 5000;
     private retryDelay = this.initialRetryDelay;
@@ -20,14 +25,15 @@ export class Wiser extends EventEmitter {
 
     constructor(
         public address: string,
-        public port: number = 8888,
+        public port: number,
         public username: string,
         public password: string,
         public log: Logger,
     ) {
         super();
 
-        this.wiserURL = `http://${this.username}:${this.password}@${this.address}/`;
+        this.wsURL = `ws://${this.address}:${this.port}/`;
+        this.httpURL = `http://${this.address}:${this.port}/`;
     }
 
     async start() {
@@ -35,29 +41,29 @@ export class Wiser extends EventEmitter {
         this.getAuthKey().then((authKey) => {
             this.log.debug(`Retrieved authKey ${authKey}`);
             this.authKey = authKey;
-            this.connectSocket().then((socket) => {
-                this.socket = socket;
+            this.connectSocket(authKey).then((wsSocket) => {
+                this.wsSocket = wsSocket;
                 this.log.debug('***Connected***');
-                this.sendAuth(socket, authKey);
+                //this.sendAuth(socket, authKey);
                 this.getLevels();
 
-                socket.on('data', (data) => {
+                wsSocket.on('message', (data) => {
                     this.log.debug(`Received ${data}`);
                     //  this.handleWiserData(data);
                 });
 
-                socket.on('close', () => {
+                wsSocket.on('close', () => {
                     this.log.warn('Wiser socket closed');
-                    this.socket = null;
+                    this.wsSocket = null;
                     this.handleConnectFailure('Socket closed');
                 });
 
-                const parser = new this.Parser();
-                parser.on('opentag', (name, attrs) => {
-                    this.handleWiserData(name, attrs);
+                // const parser = new this.Parser();
+                // parser.on('opentag', (name, attrs) => {
+                //     this.handleWiserData(name, attrs);
 
-                });
-                socket.pipe(parser);
+                // });
+                // wsSocket.send(parser);
             }).then(() => {
                 this.getProject().then((projectGroups) => {
                     this.emit('retrievedProject', projectGroups);
@@ -85,23 +91,28 @@ export class Wiser extends EventEmitter {
         this.retryDelay = this.retryDelay * 2;
     }
 
-    sendAuth(socket: Socket, authKey: string) {
+    /* sendAuth(socket: Socket, authKey: string) {
         this.log.debug('Authenticating');
         socket.write(`<cbus_auth_cmd value="${authKey}" cbc_version="3.7.0" count="0"/>`);
-    }
+    } */
 
-    async getAuthKey(): Promise<string> {
-        const url = `${this.wiserURL}clipsal/resources/projectorkey.xml`;
+    async getAuthKey() {
+        /* const url = `${this.wiserURL}clipsal/resources/projectorkey.xml`;
         const response = await this.got(url);
         this.log.debug(`Auth response body: ${response.body}`);
         const parser = new this.xml2js.Parser();
         return parser.parseStringPromise(response.body).then((result) => {
             return result.cbus_auth_data.$.value;
-        });
+        }); */
+        const shaPassword = SHA256(this.password).toString();
+        const AuthString = Buffer.from(`${this.username}:${shaPassword}`).toString(
+            'base64',
+        );
+        return AuthString;
     }
 
-    async connectSocket(): Promise<Socket> {
-        const socket = new net.Socket();
+    async connectSocket(authKey): Promise<WebSocket> {
+        /* const socket = new net.Socket();
         socket.connect(this.port, this.address);
         return new Promise((resolve, reject) => {
             socket.on('connect', () => {
@@ -113,12 +124,34 @@ export class Wiser extends EventEmitter {
                 reject(error);
                 this.socket = null;
             });
+        }); */
+        const wsAuth = authKey.replace('==', '');
+        const wsSocket = new WebSocket(this.wsURL, wsAuth, {
+            headers: {
+                Origin: this.wsURL,
+            },
+        });
+        return new Promise((resolve, reject) => {
+            wsSocket.on('open', () => {
+                this.retryDelay = this.initialRetryDelay;
+                this.log.info(`Connected to wiser ${this.address}:${this.port}`)
+                resolve(wsSocket);
+            });
+            wsSocket.on('error', (error) => {
+                reject(error);
+                this.wsSocket = null;
+            });
         });
     }
 
     async getProject(): Promise<[WiserProjectGroup]> {
-        const url = `${this.wiserURL}clipsal/resources/project.xml`;
-        const response = await this.got(url);
+        const url = `${this.httpURL}clipsal/resources/project.xml`;
+        this.log.debug(url);
+        const response = await this.got.get(url, {
+            headers: {
+                'Authorization': `Basic ${this.authKey}`,
+            },
+        });
         this.log.debug(`project response body: ${response.body}`);
         const parser = new this.xml2js.Parser();
         return parser.parseStringPromise(response.body).then((result) => {
@@ -198,12 +231,12 @@ export class Wiser extends EventEmitter {
     setGroupLevel(address: AccessoryAddress, level: number, ramp = 0) { // eslint-disable-next-line max-len
         const cmd = `<cbus_cmd app="56" command="cbusSetLevel" network="${address.network}" numaddresses="1" addresses="${address.groupAddress}" levels="${level}" ramps="${ramp}"/>`;
         this.log.debug(cmd);
-        if (null !== this.socket) {
-            this.socket!.write(cmd);
+        if (null !== this.wsSocket) {
+            this.wsSocket!.send(cmd);
         }
     }
 
     private getLevels() {
-        this.socket!.write('<cbus_cmd app="0x38" command="cbusGetLevel" numaddresses="256" />');
+        this.wsSocket!.send('<cbus_cmd app="0x38" command="cbusGetLevel" numaddresses="256" />');
     }
 }

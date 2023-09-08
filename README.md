@@ -12,19 +12,11 @@ Installation
 
 You can install the plug-in using `npm`:
 
+Wiser 2 firmware starting from 1.33.1
 `sudo npm install -g homebridge-wiser-supatech`
 
-Changes in 2.0
---------------
-
-You will need to make some changes in your config file if you are upgrading from version 1 of this plugin.
-The platform name is now `homebridge-wiser-supatech`.  Note that this change means your accessories will be re-created.
-
-Other enhancements in 2.0 include:
-
-* Support for fan controllers as HomeKit fans.
-* Support for shutter relays as HomeKit blinds.
-* The ability to ignore specific Group Addresses in the Wiser project.
+Wiser 2 Firmware before 1.33.1
+`sudo npm install -g homebridge-wiser-supatech@2.1.4`
 
 Configuration
 -------------
@@ -60,11 +52,12 @@ even if it is found in your Wiser project.
 After adding the platform, simply restart homebridge and your C-Bus groups will
 be added as new accessories automatically.
 
-**Note**: `wiserPort` is *not* the web server port on your wiser (80).  Unless you have changed your Wiser from the default settings,
-`8888` is the correct value.
+**Note**: `wiserPort` is "80" for plug-in versions starting from 2.2.0, and is "8888" for version 2.1.4.  Unless you have changed your Wiser from the default settings.
 
 Credits
 -------
 
 Thanks to [Michael Farrell](http://micolous.id.au) for some useful [Documentation](https://github.com/micolous/cbus/blob/master/docs/wiser-swf-protocol.rst)
 on the Wiser.
+
+Thanks to the origin author of the plug-in [paulw11](https://github.com/paulw11)

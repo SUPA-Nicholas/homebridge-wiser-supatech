@@ -30,7 +30,7 @@
 			"wiserPort": {
 				"title": "Wiser port password",
 				"type": "integer",
-				"default": 8888,
+				"default": 80,
 				"required": true
 			},
 			"ignoredGAs": {
