@@ -134,7 +134,7 @@ export class Wiser extends EventEmitter {
         return new Promise((resolve, reject) => {
             wsSocket.on('open', () => {
                 this.retryDelay = this.initialRetryDelay;
-                this.log.info(`Connected to wiser ${this.address}:${this.port}`)
+                this.log.info(`Connected to wiser ${this.address}:${this.port}`);
                 resolve(wsSocket);
             });
             wsSocket.on('error', (error) => {

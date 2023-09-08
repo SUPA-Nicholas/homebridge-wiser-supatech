@@ -1,6 +1,6 @@
 {
   "name": "homebridge-wiser-supatech",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "C-Bus Wiser plugin for homebridge: https://github.com/homebridge/homebridge",
   "main": "dist/index.js",
   "license": "MIT",
@@ -26,9 +26,13 @@
     "homebridge": ">=0.2.0"
   },
   "dependencies": {
+    "@types/crypto-js": "^4.1.2",
+    "@types/ws": "^8.5.4",
     "got": "^11.8.5",
     "node-xml-stream": "^1.0.2",
-    "xml2js": "^0.4.23"
+    "xml2js": "^0.4.23",
+    "ws": "^8.12.1",
+    "crypto-js": "^4.1.1"
   },
   "funding": [
     {
