@@ -29,8 +29,6 @@ export class WiserMotionSensor extends WiserAccessory {
             .setCharacteristic(this.platform.Characteristic.Model, 'Motion Sensor')
             .setCharacteristic(this.platform.Characteristic.SerialNumber, `${this.accessory.context.device.id}`.padStart(4, '0'));
 
-        service.setCharacteristic(this.platform.Characteristic.Name, this.name);
-
         service.getCharacteristic(this.platform.Characteristic.MotionDetected)
             .onGet(this.handleMotionDetectedGet.bind(this));
 

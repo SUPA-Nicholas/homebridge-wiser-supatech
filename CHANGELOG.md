@@ -1,5 +1,10 @@
 # Change log
 
+## 2.3.1
+
+- Issue fix:
+There is a dummy switch coming with the motion sensor in v2.3.0
+
 ## 2.3.0
 
 - New features: 
