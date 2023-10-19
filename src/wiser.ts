@@ -46,7 +46,6 @@ export class Wiser extends EventEmitter {
                 const duplex = createWebSocketStream(wsSocket, { encoding: 'utf8' });
                 this.log.debug('***Connected***');
                 //this.sendAuth(socket, authKey);
-                this.getLevels();
 
                 wsSocket.on('message', (data) => {
                     this.log.debug(`Received ${data}`);
@@ -211,6 +210,8 @@ export class Wiser extends EventEmitter {
                 groups.push(group);
             }
         }
+
+        this.getLevels();
 
         return groups;
     }

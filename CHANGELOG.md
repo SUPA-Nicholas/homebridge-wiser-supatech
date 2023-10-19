@@ -1,5 +1,9 @@
 # Change log
 
+## 2.3.2
+
+Get current device status from Wiser in the startup process
+
 ## 2.3.1
 
 - Issue fix:
