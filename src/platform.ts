@@ -9,6 +9,7 @@ import { WiserBulb } from './wiserbulb';
 import { WiserFan } from './wiserfan';
 import { WiserSwitch } from './wiserswitch';
 import { WiserBlind } from './wiserblind';
+import { WiserMotionSensor } from './wisermotionsensor';
 
 export class WiserPlatform implements DynamicPlatformPlugin {
     public readonly Service: typeof Service = this.api.hap.Service;
@@ -152,6 +153,9 @@ export class WiserPlatform implements DynamicPlatformPlugin {
                 break;
             case DeviceType.blind:
                 return new WiserBlind(this, accessory);
+                break;
+            case DeviceType.motionsensor:
+                return new WiserMotionSensor(this, accessory);
                 break;
             default:
                 this.log.error(`Unknown device type ${device.wiserProjectGroup.deviceType}`);

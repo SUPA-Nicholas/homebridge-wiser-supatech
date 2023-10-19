@@ -1,5 +1,16 @@
 # Change log
 
+## 2.3.0
+
+- New features: 
+CBUS motion sensor is now on Apple Home
+- Issue fix:
+Devices status is not updating on Apple Home when controlling from Wiser and buttons
+
+## 2.2.1
+
+- Fix typo and missing dependencies issue
+
 ## 2.2.0
 
 - Change net.socket to websocket for wiser 2 firmware starting from 1.33.1

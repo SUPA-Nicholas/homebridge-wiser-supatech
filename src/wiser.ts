@@ -5,7 +5,7 @@ import { EventEmitter } from 'events';
 import { AccessoryAddress, DeviceType, GroupSetEvent, WiserProjectGroup } from './models';
 import { Logger } from 'homebridge';
 //import { Socket } from 'net';
-import WebSocket from 'ws';
+import WebSocket, { createWebSocketStream } from 'ws';
 import {SHA256} from 'crypto-js';
 //import { resolve } from 'path';
 
@@ -43,6 +43,7 @@ export class Wiser extends EventEmitter {
             this.authKey = authKey;
             this.connectSocket(authKey).then((wsSocket) => {
                 this.wsSocket = wsSocket;
+                const duplex = createWebSocketStream(wsSocket, { encoding: 'utf8' });
                 this.log.debug('***Connected***');
                 //this.sendAuth(socket, authKey);
                 this.getLevels();
@@ -58,12 +59,12 @@ export class Wiser extends EventEmitter {
                     this.handleConnectFailure('Socket closed');
                 });
 
-                // const parser = new this.Parser();
-                // parser.on('opentag', (name, attrs) => {
-                //     this.handleWiserData(name, attrs);
+                const parser = new this.Parser();
+                parser.on('opentag', (name, attrs) => {
+                    this.handleWiserData(name, attrs);
 
-                // });
-                // wsSocket.send(parser);
+                });
+                duplex.pipe(parser);
             }).then(() => {
                 this.getProject().then((projectGroups) => {
                     this.emit('retrievedProject', projectGroups);
@@ -187,6 +188,9 @@ export class Wiser extends EventEmitter {
                         break;
                     case '25':
                         deviceType = DeviceType.fan;
+                        break;
+                    case '27':
+                        deviceType = DeviceType.motionsensor;
                         break;
                     default:
                         deviceType = DeviceType.switch;
