@@ -1,5 +1,10 @@
 # Change log
 
+## 2.4.0
+
+Support devices in different application address rather than lighting application only
+Change construction of serial number (1056001 - application 56 and group 1)
+
 ## 2.3.2
 
 Get current device status from Wiser in the startup process

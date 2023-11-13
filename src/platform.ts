@@ -43,7 +43,7 @@ export class WiserPlatform implements DynamicPlatformPlugin {
 
         if (undefined !== this.config.ignoredGAs) {
             for (const address of this.config.ignoredGAs) {
-                const ignore = new AccessoryAddress(address.network, address.ga);
+                const ignore = new AccessoryAddress(address.network, address.app, address.ga);
                 this.log.debug(`Adding ${ignore} to ignore list`);
                 this.ignoredAddresses.push(ignore);
             }
@@ -81,16 +81,16 @@ export class WiserPlatform implements DynamicPlatformPlugin {
     }
 
     setGroup(groupSetEvent: GroupSetEvent, missingGroupIsError = true) {
-        const accessory = this.wiserGroups[groupSetEvent.groupAddress];
+        const accessory = this.wiserGroups[Number('1' + groupSetEvent.app.toString().padStart(3, '0') + groupSetEvent.groupAddress.toString().padStart(3, '0'))];
         if (undefined !== accessory) {
             this.log.debug(`Setting ${accessory.name}(${accessory.id}) to ${groupSetEvent.level}`);
             accessory.setStatusFromEvent(groupSetEvent);
         } else {
             if (missingGroupIsError) {
-                if (!this.isIgnored(new AccessoryAddress(254, groupSetEvent.groupAddress))) {
-                    this.log.warn(`Could not find accessory to handle event for ${groupSetEvent.groupAddress}`);
+                if (!this.isIgnored(new AccessoryAddress(254, groupSetEvent.app, groupSetEvent.groupAddress))) {
+                    this.log.warn(`Could not find accessory to handle event for ${groupSetEvent.app}:${groupSetEvent.groupAddress}`);
                     this.log.warn(
-                        `Consider adding \n{\n"network":254,\n"ga":${groupSetEvent.groupAddress}\n}\n to the "ignoredGAs" config`,
+                        `Consider adding \n{\n"network":254,\n"app":${groupSetEvent.app}\n"ga":${groupSetEvent.groupAddress}\n}\n to the "ignoredGAs" config`,
                     );
                 }
             }
@@ -110,7 +110,7 @@ export class WiserPlatform implements DynamicPlatformPlugin {
 
     addDevice(group: WiserProjectGroup) {
 
-        const device = new WiserDevice(group.name, group.name, group.address.groupAddress, group, this.wiser);
+        const device = new WiserDevice(group.name, group.name, Number('1' + group.address.app.toString().padStart(3, '0') + group.address.groupAddress.toString().padStart(3, '0')), group, this.wiser);
 
         if (undefined !== this.wiserGroups[device.id]) {
             this.log.warn(`Ignoring duplicate device for group address ${device.id}`);
@@ -119,7 +119,7 @@ export class WiserPlatform implements DynamicPlatformPlugin {
 
         this.log.debug(`Adding group ${device.id}`);
 
-        const uuid = this.api.hap.uuid.generate(`${group.address.network}-${group.application}-${device.id}`);
+        const uuid = this.api.hap.uuid.generate(`${group.address.network}-${group.address.app}-${device.id}`);
         const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
 
         let wiserAccessory;
@@ -167,7 +167,7 @@ export class WiserPlatform implements DynamicPlatformPlugin {
     private isIgnored(checkAddress: AccessoryAddress): boolean {
         let ignored = false;
         for (const address of this.ignoredAddresses) { // eslint-disable-next-line eqeqeq
-            if (address.network == checkAddress.network && address.groupAddress == checkAddress.groupAddress) {
+            if (address.network == checkAddress.network && address.app == checkAddress.app && address.groupAddress == checkAddress.groupAddress) {
                 ignored = true;
             }
         }

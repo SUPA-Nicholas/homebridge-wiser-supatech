@@ -108,6 +108,7 @@ export class Wiser extends EventEmitter {
         const AuthString = Buffer.from(`${this.username}:${shaPassword}`).toString(
             'base64',
         );
+        this.log.debug(AuthString);
         return AuthString;
     }
 
@@ -160,6 +161,8 @@ export class Wiser extends EventEmitter {
     }
 
     private parseProject(project): WiserProjectGroup[] {
+        const apps:number[] = [];
+
         const widgets = project.Widgets[0]['widget'];
 
         const groups: WiserProjectGroup[] = [];
@@ -175,6 +178,10 @@ export class Wiser extends EventEmitter {
                 'undefined' !== typeof ga &&
                 'undefined' !== typeof name &&
                 'undefined' !== typeof network) {
+
+                if (!apps.includes(app)) {
+                    apps.push(app);
+                }
 
                 let deviceType: DeviceType;
 
@@ -205,43 +212,49 @@ export class Wiser extends EventEmitter {
                         fanSpeeds.sort();
                     }
                 }
-                const group = new WiserProjectGroup(name, new AccessoryAddress(network, ga), deviceType, fanSpeeds, app);
-                this.log.debug(`New group ${group.address.network}:${group.address.groupAddress} of type ${group.deviceType}`);
+                const group = new WiserProjectGroup(name, new AccessoryAddress(network, app, ga), deviceType, fanSpeeds);
+                this.log.debug(`New group ${group.address.network}:${group.address.app}:${group.address.groupAddress} of type ${group.deviceType}`);
                 groups.push(group);
             }
         }
 
-        this.getLevels();
+        for (const i of apps) {
+            this.getLevels(i);
+        }
 
         return groups;
     }
 
     handleWiserData(name, attrs) {
         if ('cbus_event' === name && 'cbusSetLevel' === attrs['name']) {
+            const app = parseInt(attrs['app']);
             const group = parseInt(attrs['group']);
             const level = parseInt(attrs['level']);
-            this.log.debug(`Setting ${group} to ${level}`);
-            this.emit('groupSet', new GroupSetEvent(group, level));
+            this.log.debug(`Setting ${app}:${group} to ${level}`);
+            this.emit('groupSet', new GroupSetEvent(app, group, level));
         } else if ('cbus_resp' === name && 'cbusGetLevel' === attrs['command']) {
+            const app = parseInt(attrs['app']);
             const levels = attrs['level'].split(',');
             for (let i = 0; i < levels.length - 1; i++) {
                 const level = parseInt(levels[i]);
                 this.log.debug(`Setting level ${level} for ${i}`);
-                this.emit('groupSetScan', new GroupSetEvent(i, level));
+                this.emit('groupSetScan', new GroupSetEvent(app, i, level));
             }
         }
     }
 
 
     setGroupLevel(address: AccessoryAddress, level: number, ramp = 0) { // eslint-disable-next-line max-len
-        const cmd = `<cbus_cmd app="56" command="cbusSetLevel" network="${address.network}" numaddresses="1" addresses="${address.groupAddress}" levels="${level}" ramps="${ramp}"/>`;
+        const cmd = `<cbus_cmd app="${address.app}" command="cbusSetLevel" network="${address.network}" numaddresses="1" addresses="${address.groupAddress}" levels="${level}" ramps="${ramp}"/>`;
         this.log.debug(cmd);
         if (null !== this.wsSocket) {
             this.wsSocket!.send(cmd);
         }
     }
 
-    private getLevels() {
-        this.wsSocket!.send('<cbus_cmd app="0x38" command="cbusGetLevel" numaddresses="256" />');
+    private getLevels(app:number) {
+        const cmd = `<cbus_cmd app="${app}" command="cbusGetLevel" numaddresses="256" />`;
+        this.log.debug(cmd);
+        this.wsSocket!.send(cmd);
     }
 }

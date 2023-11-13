@@ -35,10 +35,12 @@ Configuration
   "ignoredGAs": [
                 {
                     "network": 254,
+                    "app": 56,
                     "ga": 4
                 },
                 {
                     "network": 254,
+                    "app": 56,
                     "ga": 5
                 }
             ],

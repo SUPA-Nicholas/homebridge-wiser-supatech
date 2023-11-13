@@ -4,6 +4,7 @@ import { Wiser } from './wiser';
 
 export class GroupSetEvent {
     constructor(
+        public app: number,
         public groupAddress: number,
         public level: number,
     ) { }
@@ -31,7 +32,6 @@ export class WiserProjectGroup {
         public address: AccessoryAddress,
         public deviceType: DeviceType,
         public fanSpeeds: number[],
-        public application,
     ) { }
 }
 
@@ -48,10 +48,11 @@ export class WiserDevice {
 export class AccessoryAddress {
     constructor(
         public readonly network: number,
+        public readonly app: number,
         public readonly groupAddress: number,
     ) { }
 
     toString() {
-        return `${this.network}:${this.groupAddress}`;
+        return `${this.network}:${this.app}:${this.groupAddress}`;
     }
 }

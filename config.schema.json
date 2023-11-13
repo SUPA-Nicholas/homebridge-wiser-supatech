@@ -44,15 +44,19 @@
 							"title": "Network",
 							"type": "integer",
 							"required": true,
-							"default": 254,
+							"maximum":255
+						},
+						"app": {
+							"title": "Application",
+							"type": "integer",
+							"required": true,
 							"maximum":255
 						},
 						"ga": {
 							"title": "Group address",
 							"type": "integer",
 							"required": true,
-							"maximum":255,
-							"default": 0
+							"maximum":255
 						}
 					}
 				}
