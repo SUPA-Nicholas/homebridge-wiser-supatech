@@ -1,6 +1,6 @@
 {
   "name": "homebridge-wiser-supatech",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "C-Bus Wiser plugin for homebridge: https://github.com/homebridge/homebridge",
   "main": "dist/index.js",
   "license": "MIT",

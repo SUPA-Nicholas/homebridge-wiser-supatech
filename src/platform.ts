@@ -43,9 +43,15 @@ export class WiserPlatform implements DynamicPlatformPlugin {
 
         if (undefined !== this.config.ignoredGAs) {
             for (const address of this.config.ignoredGAs) {
-                const ignore = new AccessoryAddress(address.network, address.app, address.ga);
-                this.log.debug(`Adding ${ignore} to ignore list`);
-                this.ignoredAddresses.push(ignore);
+                if (address.from_ga <= address.from_ga) {
+                    for (let i = address.from_ga; i <= address.to_ga; i++) {
+                        const ignore = new AccessoryAddress(address.network, address.app, i);
+                        this.log.debug(`Adding ${ignore} to ignore list`);
+                        this.ignoredAddresses.push(ignore);
+                    }
+                } else {
+                    log.error('Invaild address range in ignoredGAs, fix it in your plugin config');
+                }
             }
         }
 

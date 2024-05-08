@@ -36,12 +36,14 @@ Configuration
                 {
                     "network": 254,
                     "app": 56,
-                    "ga": 4
+                    "from_ga": 4,
+                    "to_ga": 4
                 },
                 {
                     "network": 254,
                     "app": 56,
-                    "ga": 5
+                    "from_ga": 5,
+                    "to_ga": 10
                 }
             ],
 }
@@ -50,6 +52,10 @@ Configuration
 
 The `ignoredGAs` section is optional.  If a group address is listed in this section, an accessory will not be created
 even if it is found in your Wiser project.
+
+If you are ignoring a single group address, put the same number into `From group address` and `To group address`.
+
+If you are ignoring a range of group address, put the starting point into `From group address` and the ending point into `To group address`.
 
 After adding the platform, simply restart homebridge and your C-Bus groups will
 be added as new accessories automatically.

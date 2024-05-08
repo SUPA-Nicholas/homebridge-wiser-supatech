@@ -17,18 +17,18 @@
 				"required": true
 			},
 			"wiserUsername": {
-				"title": "Wiser admin user name",
+				"title": "Wiser username",
 				"type": "string",
 				"default": "admin",
 				"required": true
 			},
 			"wiserPassword": {
-				"title": "Wiser admin password",
+				"title": "Wiser password",
 				"type": "string",
 				"required": true
 			},
 			"wiserPort": {
-				"title": "Wiser port password",
+				"title": "Wiser port",
 				"type": "integer",
 				"default": 80,
 				"required": true
@@ -52,8 +52,14 @@
 							"required": true,
 							"maximum":255
 						},
-						"ga": {
-							"title": "Group address",
+						"from_ga": {
+							"title": "From group address",
+							"type": "integer",
+							"required": true,
+							"maximum":255
+						},
+						"to_ga": {
+							"title": "To group address",
 							"type": "integer",
 							"required": true,
 							"maximum":255

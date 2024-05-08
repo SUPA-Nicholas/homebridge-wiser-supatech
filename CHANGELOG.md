@@ -1,5 +1,9 @@
 # Change log
 
+## 2.5.0
+
+Support ignoring a range of group address
+
 ## 2.4.0
 
 Support devices in different application address rather than lighting application only
